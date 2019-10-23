@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Punto 10</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+	  #info {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+                color: #000000;
+            }
+    </style>
+  </head>
+  <body>
+  <div id="info"> <br/>
+            <br/>
+            Sergio Esteban Benítez Urrea <br/>
+			Juan David Casas Bello <br/>
+			Martín Rodríguez Albarracín <br/>
+        </div>
+    <script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/csg.js"></script>
+	<script src="js/THREE.CSG.js"></script>
+    <script>
+		var scene, aspect, camera, renderer, controls;
+		init();
+		animate();
+		function init(){
+			//INICIALIZACIÓN
+	        scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xAAAAAA );
+	        aspect = window.innerWidth / window.innerHeight;
+	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000);
+	        renderer = new THREE.WebGLRenderer();
+	        renderer.setSize( window.innerWidth, window.innerHeight );
+	        document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			
+			//ELEMENTOS COMUNES
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+		  	var color = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+			
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+			//scene.add( axesHelper );
+			
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color, color );
+			//scene.add( gridHelperXZ );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+
+            //CREAR ILUMINACIÓN
+            var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+            scene.add( ambient );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
+            pointLight.position.set( -5, -2, 5 );
+            scene.add( pointLight );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, .5, 100 );
+            pointLight.position.set( 5, -2, -5 );
+            scene.add( pointLight );
+			
+		
+			
+			var cajabasegeom  = new THREE.BoxGeometry( 16, 1.2 , 10);
+			var huecocajabasegeom  = new THREE.BoxGeometry( 16, 1.2 , 5.2);
+			var cajabasegeom2  = new THREE.BoxGeometry( 16, 1.2 , 7.6);	
+			var cilbasegeom  = new THREE.BoxGeometry( 6, 4.2 , 7.6);	
+			var cilgrandegeometry = new THREE.CylinderGeometry( 3, 3, 7.6, 32 );		
+			var cil2geometry = new THREE.CylinderGeometry( 1.5, 1.5, 7.6, 32 );
+			
+			var cajainclinadageom  = new THREE.BoxGeometry( 11.5, 1.2 , 6);
+			var cajainclinadageom2  = new THREE.BoxGeometry( 17, 6 , 6);	
+					
+			//CREAR LOS MATERIALES
+            var material1 = new THREE.MeshStandardMaterial( { color: colorR, metalness: 0.5, roughness: 0.1 } );
+			var material2 = new THREE.MeshStandardMaterial( { color: colorG, metalness: 0.5, roughness: 0.1, transparent:true, opacity: 0.5  } );
+			var material3 = new THREE.MeshStandardMaterial( { color: colorR, metalness: 0.5, roughness: 0.1 } );
+			
+			
+			
+			var cajabase  = new THREE.Mesh( cajabasegeom,material1);
+			var huecocajabase  = new THREE.Mesh( huecocajabasegeom,material2);
+			var cajabase2  = new THREE.Mesh( cajabasegeom2,material3  );
+			
+			var cilbase  = new THREE.Mesh( cilbasegeom,material3);
+			var cilgrande = new THREE.Mesh( cilgrandegeometry,material3);
+			var cil2 = new THREE.Mesh( cil2geometry,material2);
+			
+			var cajainclinada  = new THREE.Mesh( cajainclinadageom ,material3  );
+			var cajacorte  = new THREE.Mesh( cajainclinadageom2 ,material2  );
+			
+		
+			
+			
+			cilbase.translateY(3.6);
+			cilbase.translateX(5);
+			
+			cilgrande.translateY(5.7);
+			cilgrande.translateX(5);
+			cilgrande.rotateX(Math.PI/2);
+			
+			cil2.translateY(5.7);
+			cil2.translateX(5);
+			cil2.rotateX(Math.PI/2);
+			
+			cajainclinada.translateX(-2.7);
+			cajainclinada.translateY(4.4);
+			cajainclinada.rotateX(Math.PI/2);
+			
+			cajacorte.translateX(-2.7);
+			cajacorte.translateY(7.7);
+			cajacorte.rotateZ(Math.PI/6.2);
+		
+			var cajabaseCSG = THREE.CSG.fromMesh( cajabase );
+		    var huecocajabaseCSG = THREE.CSG.fromMesh( huecocajabase );
+			
+			var cilbaseCSG  = THREE.CSG.fromMesh( cilbase );
+			var cilgrandeCSG = THREE.CSG.fromMesh( cilgrande );
+			var cil2CSG = THREE.CSG.fromMesh( cil2);
+			
+			var cajacorteCSG = THREE.CSG.fromMesh( cajacorte );
+			var cajainclinadaCSG = THREE.CSG.fromMesh( cajainclinada );
+			
+			
+			var r1 = cajabaseCSG.subtract( huecocajabaseCSG );
+			var r2 = cilbaseCSG.union( cilgrandeCSG );
+			var r4 = cajainclinadaCSG.subtract (cajacorteCSG);
+					
+			
+			
+			var cajaconhueco = THREE.CSG.toMesh( r1);
+			var cajacircular = THREE.CSG.toMesh( r2);
+			var diagonal = THREE.CSG.toMesh( r4);
+			
+			
+			
+			cajaconhueco.material = material1;
+			cajacircular.material = material3;
+			
+		
+			cajabase2.translateY(1.2);
+			
+			
+			diagonal.material = material1;
+			
+			diagonal.translateX(-0.15);
+			diagonal.translateY(0.4);
+			
+			
+			var cajacircularCSG = THREE.CSG.fromMesh( cajacircular );
+			var r3 = cajacircularCSG.subtract( cil2CSG );
+			var cajacircularhueca = THREE.CSG.toMesh( r3);
+			cajacircularhueca.material = material3;
+            
+					scene.add(cajaconhueco);
+				scene.add(cajabase2);
+				
+			    scene.add(cajacircularhueca);
+				
+				scene.add(diagonal);
+				////////////
+				
+
+
+			camera.position.x = -3;
+			camera.position.y = 10;
+		  	camera.position.z = 20;
+			camera.lookAt( origin );
+		}
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+		function render(){
+			renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
